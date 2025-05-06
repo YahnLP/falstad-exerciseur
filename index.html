@@ -2,28 +2,53 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Exerciseur Falstad - Pont de Graetz</title>
-  <script src="js/verifier.js"></script>
+  <title>Exerciseur Falstad – Multi-exercice</title>
+  <script type="module" src="verifier.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    textarea { width: 100%; height: 150px; margin-top: 10px; }
-    iframe { border: 1px solid #ccc; width: 100%; height: 500px; margin-top: 20px; }
-    #result { margin-top: 15px; font-weight: bold; font-size: 1.2em; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      max-width: 1000px;
+    }
+    textarea {
+      width: 100%;
+      height: 150px;
+      margin-top: 10px;
+      font-family: monospace;
+    }
+    iframe {
+      width: 100%;
+      height: 500px;
+      border: 1px solid #ccc;
+      margin-top: 20px;
+    }
+    #result {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    .hidden-input {
+      display: none;
+    }
   </style>
 </head>
 <body>
-  <h1>Exercice : Construire un pont de Graetz</h1>
+  <h1>🔌 Exerciseur Falstad – Pont de Graetz (exemple)</h1>
 
   <p>
-    Objectif : Construis un redresseur double alternance (pont de Graetz) alimenté en AC avec une résistance de charge.<br>
-    Dans le simulateur ci-dessous, crée ton montage, puis fais <strong>File → Export → Text</strong> et colle-le ici :
+    👉 Dans le simulateur ci-dessous, construis un pont de Graetz avec une charge résistive. <br />
+    Ensuite, fais : <strong>File → Export → Export as Text</strong>, et colle ici le code du circuit :
   </p>
 
-  <textarea id="studentCircuit" placeholder="Colle ici le texte de ton circuit exporté..."></textarea>
-  <button onclick="verifier()">Vérifier mon circuit</button>
+  <!-- Inputs cachés : tu peux les adapter pour changer d'exercice -->
+  <input type="text" id="metaURL" value="./exercices/graetz/meta.json" class="hidden-input" />
+  <input type="text" id="solutionURL" value="./exercices/graetz/solution.txt" class="hidden-input" />
+
+  <textarea id="studentCircuit" placeholder="Colle ici ton circuit exporté..."></textarea>
+  <button onclick="verifierDepuisInterface()">✅ Vérifier mon circuit</button>
+
   <div id="result"></div>
 
-  <h2>Simulateur intégré</h2>
+  <h2>🧪 Simulateur intégré</h2>
   <iframe src="https://www.falstad.com/circuit/circuitjs.html"></iframe>
 </body>
 </html>
