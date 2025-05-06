@@ -1,27 +1,44 @@
 function verifier() {
-  const student = document.getElementById("studentCircuit").value.trim();
   const resultDiv = document.getElementById("result");
+  const circuitText = document.getElementById("studentCircuit").value.trim();
 
-  const solution = `$ 1 5.0E-6 10.20027730826997 50 5.0 50
-v 96 96 96 176 0 1 40.0 50.0 0.0 0.0 0.5
-d 176 96 256 96 1 0.805904783
-d 96 176 176 176 1 0.805904783
-d 256 176 176 176 1 0.805904783
-d 176 96 96 96 1 0.805904783
-r 256 96 256 176 0 1000.0`;
-
-  if (!student) {
+  if (!circuitText) {
     resultDiv.textContent = "⚠️ Veuillez coller votre circuit.";
     resultDiv.style.color = "orange";
     return;
   }
 
-  const normalize = str => str.replace(/\s/g, '').toLowerCase();
-  if (normalize(student) === normalize(solution)) {
-    resultDiv.textContent = "✅ Bravo ! Ton circuit est correct.";
+  const lines = circuitText.split("\n").filter(l => /^[vdr]/.test(l));
+  const composants = lines.map(ligne => {
+    const tokens = ligne.trim().split(/\s+/);
+    return {
+      type: tokens[0],
+      x1: parseInt(tokens[1]),
+      y1: parseInt(tokens[2]),
+      x2: parseInt(tokens[3]),
+      y2: parseInt(tokens[4]),
+      sens: ligne.includes("1") ? "direct" : "inconnu"
+    };
+  });
+
+  // Analyse simple : nombre de chaque composant
+  const stats = { v: 0, d: 0, r: 0 };
+  composants.forEach(c => {
+    if (stats[c.type] !== undefined) stats[c.type]++;
+  });
+
+  const hasAC = stats.v >= 1;
+  const hasDiodes = stats.d >= 4;
+  const hasResistance = stats.r >= 1;
+
+  if (hasAC && hasDiodes && hasResistance) {
+    resultDiv.textContent = "✅ Ton circuit contient bien les éléments nécessaires (AC, 4 diodes, 1 résistance).";
     resultDiv.style.color = "green";
   } else {
-    resultDiv.textContent = "❌ Le circuit ne correspond pas exactement au modèle.";
+    resultDiv.textContent = `❌ Problème détecté :
+    - Source AC : ${hasAC ? "OK" : "❌ manquante"}
+    - Diodes : ${stats.d} (attendues ≥ 4)
+    - Résistances : ${stats.r} (attendues ≥ 1)`;
     resultDiv.style.color = "red";
   }
 }
