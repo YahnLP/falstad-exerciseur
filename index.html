@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Exerciseur Falstad - Pont de Graetz</title>
+  <script src="js/verifier.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    textarea { width: 100%; height: 150px; margin-top: 10px; }
+    iframe { border: 1px solid #ccc; width: 100%; height: 500px; margin-top: 20px; }
+    #result { margin-top: 15px; font-weight: bold; font-size: 1.2em; }
+  </style>
+</head>
+<body>
+  <h1>Exercice : Construire un pont de Graetz</h1>
+
+  <p>
+    Objectif : Construis un redresseur double alternance (pont de Graetz) alimenté en AC avec une résistance de charge.<br>
+    Dans le simulateur ci-dessous, crée ton montage, puis fais <strong>File → Export → Text</strong> et colle-le ici :
+  </p>
+
+  <textarea id="studentCircuit" placeholder="Colle ici le texte de ton circuit exporté..."></textarea>
+  <button onclick="verifier()">Vérifier mon circuit</button>
+  <div id="result"></div>
+
+  <h2>Simulateur intégré</h2>
+  <iframe src="https://www.falstad.com/circuit/circuitjs.html"></iframe>
+</body>
+</html>
