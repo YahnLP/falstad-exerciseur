@@ -1,0 +1,10 @@
+{
+  "id": "redresseur-simple",
+  "title": "Redresseur simple alternance",
+  "required": {
+    "v": 1,
+    "d": 1,
+    "r": 1
+  },
+  "customVerifier": false
+}
