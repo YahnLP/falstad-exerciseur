@@ -1,0 +1,10 @@
+{
+  "id": "graetz",
+  "title": "Pont de Graetz",
+  "required": {
+    "v": 1,
+    "d": 4,
+    "r": 1
+  },
+  "customVerifier": true
+}
