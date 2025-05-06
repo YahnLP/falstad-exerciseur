@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Exerciseur Falstad – Multi-exercice</title>
+  <title>Exerciseur Falstad – Multi-exercices</title>
   <script type="module" src="verifier.js"></script>
   <style>
     body {
@@ -26,29 +26,48 @@
       margin-top: 15px;
       font-weight: bold;
     }
-    .hidden-input {
-      display: none;
+    label, select {
+      font-size: 1em;
     }
   </style>
 </head>
 <body>
-  <h1>🔌 Exerciseur Falstad – Pont de Graetz (exemple)</h1>
+  <h1>⚡ Exerciseur Falstad – Choix d'exercice</h1>
+
+  <label for="exerciseSelect">Choisis un exercice :</label>
+  <select id="exerciseSelect" onchange="changerExercice()">
+    <option value="graetz">Pont de Graetz</option>
+    <option value="charge-condensateur">Charge d’un condensateur</option>
+    <option value="redresseur-simple">Redresseur simple alternance</option>
+  </select>
 
   <p>
-    👉 Dans le simulateur ci-dessous, construis un pont de Graetz avec une charge résistive. <br />
-    Ensuite, fais : <strong>File → Export → Export as Text</strong>, et colle ici le code du circuit :
+    Dans le simulateur ci-dessous, réalise le circuit demandé.<br />
+    Ensuite, fais : <strong>File → Export → Text</strong> dans Falstad, puis colle ici le code :
   </p>
-
-  <!-- Inputs cachés : tu peux les adapter pour changer d'exercice -->
-  <input type="text" id="metaURL" value="./exercices/graetz/meta.json" class="hidden-input" />
-  <input type="text" id="solutionURL" value="./exercices/graetz/solution.txt" class="hidden-input" />
 
   <textarea id="studentCircuit" placeholder="Colle ici ton circuit exporté..."></textarea>
   <button onclick="verifierDepuisInterface()">✅ Vérifier mon circuit</button>
 
   <div id="result"></div>
 
-  <h2>🧪 Simulateur intégré</h2>
+  <h2>🧪 Simulateur Falstad intégré</h2>
   <iframe src="https://www.falstad.com/circuit/circuitjs.html"></iframe>
+
+  <!-- Fichiers liés dynamiquement -->
+  <input type="hidden" id="metaURL" />
+  <input type="hidden" id="solutionURL" />
+
+  <script>
+    function changerExercice() {
+      const exercice = document.getElementById("exerciseSelect").value;
+      document.getElementById("metaURL").value = `./exercices/${exercice}/meta.json`;
+      document.getElementById("solutionURL").value = `./exercices/${exercice}/solution.txt`;
+      document.getElementById("result").textContent = "";
+    }
+
+    // Chargement par défaut
+    changerExercice();
+  </script>
 </body>
 </html>
