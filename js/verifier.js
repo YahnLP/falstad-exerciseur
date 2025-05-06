@@ -1,44 +1,92 @@
-function verifier() {
-  const resultDiv = document.getElementById("result");
-  const circuitText = document.getElementById("studentCircuit").value.trim();
+// Regroupe les composants par type
+function groupBy(arr, key) {
+  return arr.reduce((acc, item) => {
+    (acc[item[key]] ||= []).push(item);
+    return acc;
+  }, {});
+}
 
-  if (!circuitText) {
-    resultDiv.textContent = "⚠️ Veuillez coller votre circuit.";
+// Parse le circuit Falstad exporté en une structure exploitable
+function parseCircuit(text) {
+  const components = [];
+  const lines = text.trim().split('\n');
+
+  for (let line of lines) {
+    const tokens = line.trim().split(/\s+/);
+    const type = tokens[0];
+    if (!/^[vdrclq]/.test(type)) continue; // v: voltage, d: diode, r: résistance, c: capa, l: inductance, q: transistor...
+
+    components.push({
+      type,
+      n1: `${tokens[1]},${tokens[2]}`,
+      n2: `${tokens[3]},${tokens[4]}`,
+      raw: line
+    });
+  }
+
+  return {
+    components,
+    byType: groupBy(components, 'type')
+  };
+}
+
+// Vérification générique + appel d’un script spécifique par exercice si défini
+async function verifierExercice(studentText, solutionText, meta) {
+  const feedback = [];
+  const student = parseCircuit(studentText);
+  const solution = parseCircuit(solutionText);
+
+  // Vérification de base : composants requis
+  const required = meta.required || {};
+  for (let [type, minCount] of Object.entries(required)) {
+    const actual = (student.byType[type] || []).length;
+    if (actual >= minCount) {
+      feedback.push(`✅ ${type.toUpperCase()} : ${actual} (attendu ≥ ${minCount})`);
+    } else {
+      feedback.push(`❌ ${type.toUpperCase()} : ${actual}, attendu ≥ ${minCount}`);
+    }
+  }
+
+  // Appel de la vérification personnalisée si spécifiée
+  if (meta.customVerifier && meta.id) {
+    try {
+      const module = await import(`./exercices/${meta.id}/verif.js`);
+      const resultPerso = module.verify(student, solution);
+      feedback.push(...resultPerso);
+    } catch (err) {
+      feedback.push(`⚠️ Erreur lors de la vérification personnalisée : ${err.message}`);
+    }
+  }
+
+  return feedback;
+}
+
+// Fonction principale appelée depuis index.html
+async function verifierDepuisInterface() {
+  const resultDiv = document.getElementById("result");
+  const studentCircuit = document.getElementById("studentCircuit").value.trim();
+  const metaURL = document.getElementById("metaURL").value.trim();
+  const solutionURL = document.getElementById("solutionURL").value.trim();
+
+  if (!studentCircuit || !metaURL || !solutionURL) {
+    resultDiv.innerHTML = "⚠️ Circuit, méta-données ou solution manquants.";
     resultDiv.style.color = "orange";
     return;
   }
 
-  const lines = circuitText.split("\n").filter(l => /^[vdr]/.test(l));
-  const composants = lines.map(ligne => {
-    const tokens = ligne.trim().split(/\s+/);
-    return {
-      type: tokens[0],
-      x1: parseInt(tokens[1]),
-      y1: parseInt(tokens[2]),
-      x2: parseInt(tokens[3]),
-      y2: parseInt(tokens[4]),
-      sens: ligne.includes("1") ? "direct" : "inconnu"
-    };
-  });
+  try {
+    const metaRes = await fetch(metaURL);
+    const meta = await metaRes.json();
 
-  // Analyse simple : nombre de chaque composant
-  const stats = { v: 0, d: 0, r: 0 };
-  composants.forEach(c => {
-    if (stats[c.type] !== undefined) stats[c.type]++;
-  });
+    const solutionRes = await fetch(solutionURL);
+    const solutionText = await solutionRes.text();
 
-  const hasAC = stats.v >= 1;
-  const hasDiodes = stats.d >= 4;
-  const hasResistance = stats.r >= 1;
+    const feedback = await verifierExercice(studentCircuit, solutionText, meta);
 
-  if (hasAC && hasDiodes && hasResistance) {
-    resultDiv.textContent = "✅ Ton circuit contient bien les éléments nécessaires (AC, 4 diodes, 1 résistance).";
-    resultDiv.style.color = "green";
-  } else {
-    resultDiv.textContent = `❌ Problème détecté :
-    - Source AC : ${hasAC ? "OK" : "❌ manquante"}
-    - Diodes : ${stats.d} (attendues ≥ 4)
-    - Résistances : ${stats.r} (attendues ≥ 1)`;
+    resultDiv.innerHTML = feedback.map(f => `<div>${f}</div>`).join('');
+    resultDiv.style.color = "black";
+  } catch (err) {
+    resultDiv.innerHTML = `❌ Erreur de chargement ou d’analyse : ${err.message}`;
     resultDiv.style.color = "red";
   }
 }
