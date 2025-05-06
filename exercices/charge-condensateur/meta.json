@@ -1,0 +1,11 @@
+{
+  "id": "charge-condensateur",
+  "title": "Charge d’un condensateur",
+  "required": {
+    "v": 1,
+    "c": 1,
+    "r": 1,
+    "s": 1
+  },
+  "customVerifier": false
+}
